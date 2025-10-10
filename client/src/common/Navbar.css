@@ -1,0 +1,22 @@
+nav {
+    display: inline-block;
+    position: fixed;
+    top: 0;
+    height: 60px;
+    width: 100%;
+    z-index: 1000;
+    font-size: 18px;
+}
+
+nav ul {
+    list-style: none;
+}
+
+a {
+    text-decoration: none;
+    color: var(--surface);
+}
+
+.navbar-logo {
+    transform: translateY(3px);
+}
