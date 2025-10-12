@@ -125,3 +125,10 @@ export const login = async (req, res) => {
 		});
 	}
 };
+
+export const failedLogin = (req, res) => {
+	return res.status(401).json({
+		status: "error",
+		message: "Please login..!!",
+	});
+};
