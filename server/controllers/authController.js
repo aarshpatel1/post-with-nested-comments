@@ -17,13 +17,15 @@ export const signup = async (req, res) => {
 			});
 		}
 
-		let { firstName, lastName, email, password, profilePhoto } = req.body;
+		let { firstName, lastName, email, password, confirmPassword } =
+			req.body;
 
 		const fields = [
 			{ name: "First Name", value: firstName },
 			{ name: "Last Name", value: lastName },
 			{ name: "Email", value: email },
 			{ name: "Password", value: password },
+			{ name: "Confirm Password", value: confirmPassword },
 		];
 
 		const validationResult = validateFields(fields);
@@ -36,6 +38,13 @@ export const signup = async (req, res) => {
 			return res.status(409).json({
 				status: "error",
 				message: "User already registered with this email..!!",
+			});
+		}
+
+		if (password !== confirmPassword) {
+			return res.status(400).json({
+				status: "error",
+				message: "Password and Confirm Password does not match..!",
 			});
 		}
 
