@@ -1,18 +1,17 @@
 import { useState } from "react";
 import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
+import { Messages } from "primereact/messages";
+import { useAuth } from "../contexts/AuthContext";
+import { useNavigate } from "react-router";
 
 export default function Login() {
 	const [user, setUser] = useState({});
 	const [loading, setLoading] = useState(false);
+	const [error, setError] = useState("");
 
-	const load = () => {
-		setLoading(true);
-
-		setTimeout(() => {
-			setLoading(false);
-		}, 2000);
-	};
+	const login = useAuth();
+	const navigate = useNavigate();
 
 	const handleChange = (e) => {
 		const { name, value } = e.target;
@@ -25,8 +24,32 @@ export default function Login() {
 		setLoading(false);
 	};
 
+	const handleSubmit = async (e) => {
+		e.preventDefault();
+		try {
+			setLoading(true);
+			setError("");
+
+			const result = await login(user.email, user.password);
+
+			if (result.success) {
+				navigate("/");
+			} else {
+				setError("Login again..!!");
+			}
+		} catch (error) {
+			setError("Failed to login..!!");
+		} finally {
+			setUser({});
+			setLoading(false);
+		}
+	};
+
 	return (
-		<form className="flex flex-column min-h-screen align-items-center justify-content-center">
+		<form
+			className="flex flex-column min-h-screen align-items-center justify-content-center"
+			onSubmit={handleSubmit}
+		>
 			<h1 className="text-center mt-0">Login</h1>
 			<div className="card flex justify-content-center mb-3">
 				<div className="flex flex-column gap-2">
@@ -62,10 +85,14 @@ export default function Login() {
 					label="Submit"
 					icon="pi pi-check"
 					loading={loading}
-					onClick={load}
+					type="submit"
 					size="small"
 				/>
 			</div>
+
+			{error && (
+				<Messages severity="error" text={error} className="my-3" />
+			)}
 		</form>
 	);
 }

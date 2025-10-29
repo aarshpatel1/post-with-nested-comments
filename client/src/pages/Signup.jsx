@@ -1,18 +1,17 @@
 import { useState } from "react";
 import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
+import { Messages } from "primereact/messages";
+import { useAuth } from "../contexts/AuthContext";
+import { useNavigate } from "react-router";
 
 export default function Signup() {
 	const [user, setUser] = useState({});
 	const [loading, setLoading] = useState(false);
+	const [error, setError] = useState("");
 
-	const load = () => {
-		setLoading(true);
-
-		setTimeout(() => {
-			setLoading(false);
-		}, 2000);
-	};
+	const { signup } = useAuth();
+	const navigate = useNavigate();
 
 	const handleChange = (e) => {
 		const { name, value } = e.target;
@@ -23,6 +22,34 @@ export default function Signup() {
 		e.preventDefault();
 		setUser({});
 		setLoading(false);
+	};
+
+	const handleSubmit = async (e) => {
+		e.preventDefault();
+		try {
+			setLoading(true);
+			setError("");
+
+			if (user.password !== user.confirmPassword) {
+				setError("Password should be match..!!");
+				setLoading(false);
+				return;
+			}
+
+			const { confirmPassword, ...userData } = user;
+			const result = await signup(userData);
+
+			if (result.success) {
+				navigate("/dashboard");
+			} else {
+				setError("Signup again..!!");
+			}
+		} catch (error) {
+			setError("Failed to signup..!!");
+		} finally {
+			setUser({});
+			setLoading(false);
+		}
 	};
 
 	return (
@@ -74,10 +101,14 @@ export default function Signup() {
 					label="Submit"
 					icon="pi pi-check"
 					loading={loading}
-					onClick={load}
+					type="submit"
 					size="small"
 				/>
 			</div>
+
+			{error && (
+				<Messages severity="error" text={error} className="my-3" />
+			)}
 		</form>
 	);
 }
